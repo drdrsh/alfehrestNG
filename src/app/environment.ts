@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   apiURL: 'http://alfehrest.org/',
   apiVersion: 2,
   apiKeyP1: 'VGajz339h2aHw4b752XS49S0jgOOF6qd',
@@ -10,9 +10,10 @@ export const environment = {
     'scholars': 'scholar'
   },
   localToApiLookup: {
-    'state': 'areas',
+    'state': 'states',
     'event': 'events',
     'scholar': 'scholars'
   },
+  pinEntities: ['event', 'scholar'],
   GMKey: "AIzaSyCjXZ3cPqmcP7PqGpotxqRETyTVyVruFBw"
 };

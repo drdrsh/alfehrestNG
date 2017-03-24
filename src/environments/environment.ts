@@ -1,8 +1,18 @@
-// The file contents for the current environment will overwrite these during build.
-// The build system defaults to the dev environment which uses `environment.ts`, but if you do
-// `ng build --env=prod` then `environment.prod.ts` will be used instead.
-// The list of which env maps to which file can be found in `.angular-cli.json`.
-
 export const environment = {
-  production: false
+  production: false,
+  apiURL: 'http://alfehrest.org/',
+  apiVersion: 2,
+  apiKeyP1: 'VGajz339h2aHw4b752XS49S0jgOOF6qd',
+  apiKeyP2: 'W6wZ66xTopfGQOKwaN0VGSuGO53534Dy',
+  apiToLocalLookup: {
+    'states': 'state',
+    'events': 'event',
+    'scholars': 'scholar'
+  },
+  localToApiLookup: {
+    'state': 'areas',
+    'event': 'events',
+    'scholar': 'scholars'
+  },
+  GMKey: "AIzaSyCjXZ3cPqmcP7PqGpotxqRETyTVyVruFBw"
 };
