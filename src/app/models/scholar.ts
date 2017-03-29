@@ -11,7 +11,7 @@ export class ScholarModel extends Model{
 
     public static fromInitial(obj:any) {
         let injector = ReflectiveInjector.resolveAndCreate([DateConverterService, TranslateService, TRANSLATION_PROVIDERS]);
-        let entity = new ScholarModel(injector.get(DateConverterService), obj);
+        let entity = new ScholarModel(injector.get(DateConverterService), injector.get(TranslateService), obj);
         entity._entityType = 'scholar';
         return entity;
     }
@@ -51,6 +51,11 @@ export class ScholarModel extends Model{
     }
 
     public get data() : DisplayData {
+
+        if(this._displayData) {
+            return this._displayData;
+        }
+
         let data = new DisplayData();
         data.title = this.internalData.name;
 
@@ -60,26 +65,26 @@ export class ScholarModel extends Model{
         let referenceSection = new DisplaySection();
 
         mainSection.cls = "scholar";
-        mainSection.title =  this.internalData.name;
-        mainSection.subtitle = "Subtitle";
+        mainSection.title =  "";
+        mainSection.subtitle = "";
         mainSection.content = this.internalData.description;
         mainSection.type = "text";
 
         achSection.cls = "achievements";
-        achSection.title =  this.internalData.name;
-        achSection.subtitle = "Subtitle";
+        achSection.title =  "انجازاته";
+        achSection.subtitle = "";
         achSection.content = this.internalData.achievements;
         achSection.type = "text";
 
         pubSection.cls = "publications";
-        pubSection.title =  this.internalData.name;
-        pubSection.subtitle = "Subtitle";
+        pubSection.title =  "كتبه";
+        pubSection.subtitle = "";
         pubSection.content = this.internalData.publications;
         pubSection.type = "bib";
 
         referenceSection.cls = "references";
-        referenceSection.title = "References";
-        referenceSection.subtitle = "Subtitle";
+        referenceSection.title = "المراجع";
+        referenceSection.subtitle = "";
         referenceSection.content = this.internalData.references;
         referenceSection.type = "list";
 
@@ -88,7 +93,9 @@ export class ScholarModel extends Model{
         data.sections.push(pubSection);
         data.sections.push(referenceSection);
 
-        return data;
+        this._displayData = data;
+        return this._displayData;
+
     }
 
 

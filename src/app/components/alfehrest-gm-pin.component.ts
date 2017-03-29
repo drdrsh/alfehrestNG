@@ -114,12 +114,23 @@ export class AlfehrestMapPin {
     }
 
     private onClick(ev) {
-        google.maps.event.trigger(this.map, 'pin_clicked', this.pin.pins);
-        this.router.navigate([
-            'time', this.route.snapshot.params['time'],
-            this.pin.pins[0].entityType, this.pin.pins[0].id
-        ]);
+        google.maps.event.trigger(this.map, 'pin_clicked', this.pin);
+        let t = parseFloat(this.route.snapshot.params['time']);
+        let t1 = t + 1;
+        if(this.pin.pins.length == 1) {
+            this.router.navigate(['time', t1], { skipLocationChange: true });
+            this.router.navigate([
+                'time', this.route.snapshot.params['time'],
+                this.pin.pins[0].entityType, this.pin.pins[0].id, 0
+            ]);
+        } else {
+            this.dataStore.selectedAggregate = this.pin;
+            let q = {};
+            q['x' + Math.round(Math.random()* 100)] = 1;
+            this.router.navigate(['time', this.route.snapshot.params['time'], 'agg'], {queryParams: q});
+        }
     }
+
 
     private onMouseMove(ev) {
         //console.log(ev, this);

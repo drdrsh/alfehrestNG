@@ -1,6 +1,7 @@
 import {DateConverterService} from "../services/date-converter/date-converter.service";
 import {DisplayData} from "../components/interfaces/display-data";
 import {MapCenter} from "../components/interfaces/MapCenter";
+import {TranslateService} from "../language/translation.service";
 export abstract class Model {
 
     protected internalData:any;
@@ -8,6 +9,7 @@ export abstract class Model {
     protected _isVisible:boolean = false;
     protected _selected:boolean = false;
     protected _entityType:string = "";
+    protected _displayData = null;
 
     protected abstract readData();
 
@@ -17,7 +19,7 @@ export abstract class Model {
     public abstract get center(): MapCenter;
     public abstract get title(): string;
 
-    constructor(protected dateHelper: DateConverterService, initialData:any) {
+    constructor(protected dateHelper: DateConverterService, protected translateService:TranslateService, initialData:any) {
         this.internalData = initialData;
         this.readData();
     }
@@ -28,6 +30,10 @@ export abstract class Model {
 
     get id() : number {
         return this.internalData.id;
+    }
+
+    get subid() : number {
+        return 0;
     }
 
     get activeState() {

@@ -9,6 +9,7 @@ import {ModelFactoryService} from "./model-factory.service";
 import {Model} from "../models/model";
 import * as CryptoJS from "crypto-js";
 import {environment} from "../environment"
+import {PinAggregate} from "../components/interfaces/PinAggregate";
 
 @Injectable()
 export class AlfehrestDataService {
@@ -17,6 +18,8 @@ export class AlfehrestDataService {
     @Output() entity_data_loaded:EventEmitter<Model>;
     @Output() entity_data_loading:EventEmitter<Model>;
     @Output() active_period_changed:EventEmitter<Model[]>;
+
+    private _selectedAggregate:PinAggregate = null;
 
     private pendingUpdate:any = null;
     private apiVersion:number = environment.apiVersion;
@@ -46,9 +49,6 @@ export class AlfehrestDataService {
 
     private getRequestHeaders(url:string) {
 
-        //http://alfehrest.org/scholars/:application/vnd.alfehrest.org+json;version=2:ar:1489457892;
-        //2f0cdc1de4fe6afc3dc5f06243f1487568f67831
-
         let headers = new Headers();
 
         let secretKey = environment.apiKeyP1;
@@ -71,6 +71,14 @@ export class AlfehrestDataService {
         return headers;
     }
 
+    public get selectedAggregate() {
+        return this._selectedAggregate;
+    }
+
+    public set selectedAggregate(s) {
+        this._selectedAggregate = s;
+    }
+
     private onEntityError(err:any) {
 
     }
@@ -82,6 +90,7 @@ export class AlfehrestDataService {
     }
 
     private onEntityLoaded(type:string, id:number, subid:number, value:any) {
+        this.selectedAggregate = null;
         this.entity_data_loaded.emit(this.prepareEntityData(type, id, subid, value));
     }
 
@@ -179,6 +188,8 @@ export class AlfehrestDataService {
     }
 
     updateActivePeriod(currentTime:Date) {
+
+        this.selectedAggregate = null;
 
         if(!this.initialDataLoaded) {
             if(this.pendingUpdate) {

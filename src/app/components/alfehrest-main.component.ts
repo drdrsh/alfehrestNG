@@ -8,6 +8,8 @@ import {Model} from "../models/model";
 import {MapCenter} from "./interfaces/MapCenter";
 import {GoogleMapsComponent} from "./gm-map.component";
 import {environment} from "../environment";
+import {DisplayData, DisplaySection} from "./interfaces/display-data";
+import {PinAggregate} from "./interfaces/PinAggregate";
 
 @Component({
     moduleId: module.id,
@@ -28,41 +30,77 @@ import {environment} from "../environment";
                 (map_ready)="onMapReady()"  
                 (map_pan_started)="onMapPanStarted()" 
                 (map_pan_finished)="onMapPanFinished()" 
+                (map_aggregate_clicked)="onMapAggregateClicked($event)"
                 [center]="currentCenter">
             </gm-map>
             <div #contentPane class="content-pane">
-                    <h2 [innerHTML]="currentTitle"></h2>
+                    <h2>{{currentTitle}}</h2>
+                    <div class="btn-close" (click)="onCloseClicked()"></div>
+                    
                 <router-outlet></router-outlet>
             </div>
             <alfehrest-slider #slider 
                 (value_sliding)="onSliderSliding($event)"
                 (close_button_clicked)="onSliderCloseClicked()">
-        </alfehrest-slider>
-            <div #bottomPane class="bottom-pane">
-                <span class="year">{{currentDate | hijri:'gmmmm gyyyy ce (hmmmm hyyyy ah)'}}</span>
-                <div class="menu-toggle" (click)="onMenuBtnClicked()">
-                    <svg width="30" height="30" id="icoOpen">
-                        <path d="M0,5 30,5" stroke="#006600" stroke-width="5"/>
-                        <path d="M0,14 30,14" stroke="#006600" stroke-width="5"/>
-                        <path d="M0,23 30,23" stroke="#006600" stroke-width="5"/>
-                    </svg>
-                </div>
-            </div>
+            </alfehrest-slider>
+            <alfehrest-bottom-panel 
+                    
+                [current-date]="currentDate" 
+                (menu_button_clicked)="menuOpen = !menuOpen" #bottomPanel>
+            </alfehrest-bottom-panel>
         </div>
-        <div #sidePane class="side-pane">
-            <ul>
-                <li class='about'>عن الفهرست</li>
-                <li class='search'>بحث</li>
-                <li class='settings'>الإعدادت</li>
-                <li class='help'>مساعدة</li>
-                <li class='facebook'>صفحتنا على الفيسبوك</li>
-                <li class='twitter'>حسابنا على تويتر</li>
-                <li class='report'>الإبلاغ عن خطأ</li>
-                <li class='exit'>خروج</li>
-            </ul>        
-        </div>
+        <alfehrest-side-panel #sidePanel></alfehrest-side-panel>
         `,
     styles: [`
+        alfehrest-bottom-panel {
+            position:absolute;
+            height:35px;
+            width:100%;
+            left:0;
+            bottom:0;
+            transform: translateY(0px);
+            transition: transform 0.3s;
+        }
+        
+        alfehrest-slider {
+            position: absolute;
+            left:0;
+            width:120px;
+            height: 80%;
+            z-index: 15;
+            transition: all 0.5s;
+            box-shadow: 0 0 5px 1px #222;
+        }
+        
+        alfehrest-side-panel {
+            width:200px;
+            height:100%;
+            position: fixed;
+            right:0;
+            top:0;
+        }
+        
+        gm-map {
+            width: 100%;
+            height: calc(100% - 35px);
+            position: absolute;
+            left: 0;
+            top:0;
+            z-index:0;
+            background-color:white;
+        }
+        
+        .main-pane {
+            transition: transform 0.5s;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
+            z-index:1;
+            box-shadow: 0 0 5px 5px #222;
+        }
+        
         .logo {
             transition: all 0.5s;
             background-image: url('assets/logo.png');
@@ -87,60 +125,47 @@ import {environment} from "../environment";
             opacity: 1;
         }
         
-        .main-pane {
-            transition: transform 0.5s;
-            position: fixed;
-            width: 100%;
-            height: 100%;
-            left: 0;
-            top: 0;
-            z-index:1;
-        }
+
 
         .menu-open .main-pane{
             transform: translateX(-200px);
         }
         
-        .side-pane {
-            position: fixed;
-            left: 0;
-            right:0;
-            top:0;
-            bottom:0;
-
-            width:200px;
-
-        	z-index:-22;
-            overflow-x: hidden;
-            overflow-y: auto;
-            color: #fff;
-            box-shadow: inset 0 0 5px 5px #222;
-            background-color: #333;
-            background-image:url('assets/logo.png');
-            background-size:65px 65px;
-            background-position:50% 95%;
-            background-repeat:no-repeat;
-        }
-        
         .content-pane h2 {
             height: 50px;
             margin: 0;
-            color: wheat;
+            background-color: #222;
+            color:white;
             box-sizing: border-box;
-            padding: 10px;
+            padding: 3px;
         }
-        
+         
         .content-pane {
-            transition: all 1.5s;
-            width: calc(100% - 120px);
+            transition: all 0.5s;
+            width:100%;
             height: 50%;
             position: absolute;
             right: 0;
             bottom: 100%;
-            z-index: 15;
-            background-color: black;
+            z-index: 15;    
         }
         
+        .content-pane .btn-close {
+            position: absolute;
+            left:0;
+            top:0;
+            background-image: url("assets/close-square.png");
+            background-repeat: no-repeat;
+            width:50px;
+            height:50px;
+            background-size: 50px 50px;
+            transform: translateX(120px);
+            transition: all 0.5s;
+            cursor: pointer;
+        }
+        .slider-gone .content-pane .btn-close {
+            transform: translateX(0px);
+        }
         .map-panning .content-pane {
             opacity: 0.1;
         }
@@ -156,112 +181,48 @@ import {environment} from "../environment";
         
         .content-open .content-pane {
             transform: translateY(100%);
+            box-shadow: 0 0 25px 1px #222;
         }
 
   
-        gm-map {
-            width: 100%;
-            height: calc(100% - 35px);
-            position: absolute;
-            left: 0;
-            top:0;
-            z-index:0;
+
         
-        }
-        
-        alfehrest-slider {
-            position: absolute;
-            left:0;
-            width:120px;
-            height: 80%;
-            background-color:red;
-            z-index: 15;
-            border-radius: 0  0 25px 0;
-            transition: all 1.5s;
-        }
+
         
         .slider-gone  alfehrest-slider {
-            transform: translateY(-90%);
+            transform: translateX(-100%);
         }
         
-        .menu-toggle {
-            width: 70px;
-            height:35px;
-            padding-top:4px;
-            background-color:white;
-            cursor:pointer;
-        }
-
-        .slider-gone  .content-pane {
-            width:100%;
+        .content-pane  /deep/ .tab-body p,
+        .content-pane  /deep/ .tab-body ol {
+            width: calc(100% - 120px);
         }
         
-        .bottom-pane {
-            position:absolute;
-            height:35px;
-            width:100%;
-            left:0;
-            bottom:0;
-            transform: translateY(0px);
-            transition: transform 0.3s;
-            text-align:center;
-            background-color:#006600;
-            border:1px solid black;
-            border-bottom:0;
-            white-space:nowrap;
-            font-weight:bold;
-            color:white;
-            font-size:80%;
+        .slider-gone  .content-pane  /deep/ .tab-body p,
+        .slider-gone  .content-pane  /deep/ .tab-body ol {
+            width: auto;
         }
+        
+        
     
-        .bottom-pane > span{
-            display:block;
-            float:left;
-            width:50%;
-            text-align:left;
-            margin-left:15px;
-            margin-top:5px;
+        .scrolling .slimscroll-grid, 
+        .scrolling .slimscroll-bar {
+            transition: all 0.2s !important;
+            opacity: 1 !important;
         }
-
-        .side-pane  ul{
-            margin:0;
-            padding:0;
+        
+        
+        .slimscroll-grid, 
+        .slimscroll-bar {
+            transition: all 0.2s !important;
+            opacity: 0 !important;
         }
-        .side-pane li{
-            cursor:pointer;
-            background-repeat:no-repeat;
-            background-position:5% 50%;
-            background-size:30px 30px;
-            text-indent:5px;
-            display: block;
-            margin: 0;
-            line-height: 48px;
-            border-top: 1px solid #4d4d4d;
-            border-bottom: 1px solid #1a1a1a;
+        
+        .slimscroll-bar {
+            width: 8px !important;
+            left: 2px !important;
         }
-
-        .side-pane li.facebook{
-            background-image:url('assets/facebook.png');
-        }
-        .side-pane li.twitter{
-            background-image:url('assets/twitter.png');
-        }
-        .side-pane li.about{
-            background-image:url('assets/about.png');
-        }
-        .side-pane li.settings{
-            background-image:url('assets/settings.png');
-        }
-        .side-pane li.report{
-            background-image:url('assets/report.png');
-        }
-        .side-pane li.help{
-            background-image:url('assets/help.png');
-        }
-        .side-pane li.search{
-            background-image:url('assets/search.png');
-        }
-
+        
 
     `]
 })
@@ -293,6 +254,7 @@ export class AlfehrestMainComponent {
     onQueryStarted(requestedEntity:Model) {
         this.contentPaneOpen = true;
         this.currentCenter = requestedEntity.center;
+
         this.currentTitle = requestedEntity.title;
         let contentPaneHeight = this.domContentPane.nativeElement['offsetHeight'];
         let contentPaneWidth = this.domContentPane.nativeElement['offsetWidth'];
@@ -304,8 +266,6 @@ export class AlfehrestMainComponent {
         if(environment.pinEntities.indexOf(requestedEntity.entityType) != -1) {
             this.currentCenter.offsetY -= 40;
         }
-        this.sliderHidden = true;
-
     }
 
     onDataArrived(loadedEntity:Model) {
@@ -329,7 +289,6 @@ export class AlfehrestMainComponent {
     onMapPanFinished() {
         this.currentCenter = null;
         this.isPanning = false;
-        console.log('finished');
     }
 
     onSliderCloseClicked() {
@@ -337,7 +296,6 @@ export class AlfehrestMainComponent {
     }
 
     onSliderSliding(date:number) {
-
         this.currentDate = new Date(date);
     }
 
@@ -351,5 +309,17 @@ export class AlfehrestMainComponent {
 
     onMenuBtnClicked() {
         this.menuOpen = !this.menuOpen;
+    }
+
+    onCloseClicked() {
+        this.contentPaneOpen = false;
+        this.currentCenter = null;
+    }
+
+    onMapAggregateClicked(pin:PinAggregate){
+
+        this.currentTitle = pin.title;
+
+
     }
 }

@@ -15,6 +15,7 @@ export class MapOverlayLabelGen {
         span.style.cssText = `
             background-color:green;
             border-radius:36px;
+            font-family: serif !important;
             border: 2px solid white;
             position: relative;
             display: inline-block;
@@ -26,7 +27,6 @@ export class MapOverlayLabelGen {
             white-space: nowrap;
             color:#ffffff;
             padding: 2px;
-            font-family: Arial;
             text-shadow: 0 1px 1px #707070;
             text-align: center;
             font-size: 12px;

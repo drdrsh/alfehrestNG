@@ -1,4 +1,5 @@
-import {NgModule, ApplicationRef} from "@angular/core"
+
+import {NgModule, ApplicationRef, Renderer, OnInit, Directive, ViewContainerRef, Inject} from "@angular/core"
 import {AppComponent} from "./app.component";
 
 import {NouisliderModule, NouisliderComponent} from 'ng2-nouislider';
@@ -26,6 +27,10 @@ import {AppStateService} from "./services/app-state.service";
 import {HijriPipe} from "./pipes/hijri.pipe";
 import {TranslateService} from "./language/translation.service";
 import {TRANSLATION_PROVIDERS} from "./language/translation";
+import {AlfehrestBottomPanelComponent} from "./components/alfehrest-bottom-pane";
+import {AlfehrestSidePanelComponent} from "./components/alfehrest-side-panel";
+import {SlimScrollModule} from "ng2-slimscroll/index";
+
 
 
 @NgModule({
@@ -33,6 +38,7 @@ import {TRANSLATION_PROVIDERS} from "./language/translation";
         BrowserModule,
         RouterModule,
         HttpModule,
+        SlimScrollModule,
         RouterModule.forRoot(routes, { useHash: false }),
     ],
     providers:    [
@@ -48,11 +54,13 @@ import {TRANSLATION_PROVIDERS} from "./language/translation";
 
         AppComponent,
         AlfehrestMainComponent,
+        AlfehrestSidePanelComponent,
+        AlfehrestBottomPanelComponent,
+        AlfehrestSliderComponent,
         AlfehrestContentComponent,
         AlfehrestScholarContentComponent,
         AlfehrestEventContentComponent,
         AlfehrestStateContentComponent,
-        AlfehrestSliderComponent,
         AlfehrestTabsComponent,
         GoogleMapsComponent,
         AlfehrestMapArea,
@@ -65,3 +73,51 @@ import {TRANSLATION_PROVIDERS} from "./language/translation";
     bootstrap:    [ AppComponent ]
 })
 export class AppModule {}
+
+
+@NgModule({
+    imports:      [
+        BrowserModule,
+    ],
+    providers:    [],
+    declarations: [
+    ],
+    exports:      [],
+    bootstrap:    []
+})
+export class ScrollModule {}
+
+
+@Directive({
+    selector: '[simplescroll]',
+    exportAs: 'simplescroll'
+})
+export class ScrollDirective implements OnInit {
+
+    el: HTMLElement;
+    wrapper: HTMLElement;
+    grid: HTMLElement;
+    bar: HTMLElement;
+    body: HTMLElement;
+    pageY: number;
+    top: number;
+    dragging: boolean;
+    mutationThrottleTimeout: number;
+    mutationObserver: MutationObserver;
+    lastTouchPositionY: number;
+
+    constructor(
+        @Inject(ViewContainerRef) private viewContainer: ViewContainerRef,
+        @Inject(Renderer) private renderer: Renderer) {
+        if (typeof window === 'undefined') { return; }
+        this.viewContainer = viewContainer;
+        this.el = viewContainer.element.nativeElement;
+    }
+
+    ngOnInit() {
+        if (typeof window === 'undefined') { return; }
+        console.log('hello');
+    }
+
+
+}

@@ -43,6 +43,7 @@ export class GoogleMapsComponent {
     @Output('map_ready') map_ready:EventEmitter<any>;
     @Output('map_pan_started') map_pan_started:EventEmitter<any>;
     @Output('map_pan_finished') map_pan_finished:EventEmitter<any>;
+    @Output('map_aggregate_clicked') map_aggregate_clicked:EventEmitter<PinAggregate>;
 
     @ViewChild('container') domContainer: ElementRef;
 
@@ -70,6 +71,7 @@ export class GoogleMapsComponent {
         this.map_ready = new EventEmitter();
         this.map_pan_started = new EventEmitter();
         this.map_pan_finished = new EventEmitter();
+        this.map_aggregate_clicked = new EventEmitter();
 
     }
 
@@ -173,6 +175,8 @@ export class GoogleMapsComponent {
         this.map_ready.emit(this.map);
     }
 
+
+
     private onAreaClicked(model:StateModel) {
         this.selectedAreaId = model.id;
         for(let a of this.areas) {
@@ -182,7 +186,7 @@ export class GoogleMapsComponent {
         this.changeDetector.detectChanges();
     }
 
-    private onPinClicked(models:Model[]) {
+    private onPinClicked(pin:PinAggregate) {
         this.selectedAreaId = -1;
         this.changeDetector.detectChanges();
     }

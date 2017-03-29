@@ -5,12 +5,13 @@ import {DisplayData, DisplaySection} from "../components/interfaces/display-data
 import {MapCenter} from "../components/interfaces/MapCenter";
 import {TRANSLATION_PROVIDERS} from "../language/translation";
 import {TranslateService} from "../language/translation.service";
+import {HijriPipe} from "../pipes/hijri.pipe";
 
 export class EventModel extends Model {
 
     public static fromInitial(obj:any) {
         let injector = ReflectiveInjector.resolveAndCreate([DateConverterService, TranslateService, TRANSLATION_PROVIDERS]);
-        let entity = new EventModel(injector.get(DateConverterService), obj);
+        let entity = new EventModel(injector.get(DateConverterService), injector.get(TranslateService), obj);
         entity._entityType = 'event';
         return entity;
     }
@@ -36,31 +37,39 @@ export class EventModel extends Model {
     }
 
     public get title():string {
-        return this.internalData.name;
+        return this.internalData.title;
     }
 
     public get data() : DisplayData {
+
+        if(this._displayData) {
+           return this._displayData;
+        }
+
         let data = new DisplayData();
-        data.title = this.internalData.name;
+        data.title = this.internalData.title;
 
         let mainSection = new DisplaySection();
         let referenceSection = new DisplaySection();
 
+        let hPipe = new HijriPipe(this.translateService);
+        this.translateService.use('ar');
         mainSection.cls = "event";
         mainSection.title =  this.internalData.name;
-        mainSection.subtitle = "Subtitle";
+        mainSection.subtitle = hPipe.transform(this.internalData.date, "gd gmmmm gyyyy ce (hd hmmmm hyyyy ah)");
         mainSection.content = this.internalData.description;
         mainSection.type = "text";
 
         referenceSection.cls = "references";
-        referenceSection.title = "References";
-        referenceSection.subtitle = "Subtitle";
+        referenceSection.title = "المراجع";
+        referenceSection.subtitle = "";
         referenceSection.content = this.internalData.references;
         referenceSection.type = "list";
 
         data.sections.push(mainSection);
         data.sections.push(referenceSection);
 
+        this._displayData = data;
         return data;
     }
 

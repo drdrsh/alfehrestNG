@@ -12,10 +12,10 @@ export const routes:Route[]= [{
         path: 'time/:time',
         component: AlfehrestMainComponent,
         children: [{
-            path: ':entityType/:id/:sid',
+            path: 'agg',
             component: AlfehrestContentComponent
-        },{
-            path: ':entityType/:id',
+        }, {
+            path: ':entityType/:id/:sid',
             component: AlfehrestContentComponent
         }]
 }];

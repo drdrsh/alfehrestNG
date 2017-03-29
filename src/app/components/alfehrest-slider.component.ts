@@ -8,6 +8,7 @@ import { NouisliderModule } from 'ng2-nouislider';
     selector: "alfehrest-slider",
     template: `
     <div class="container">
+        <div class="btn-close" (click)="onCloseBtnClicked()"></div>
         <h1 class="logo"></h1>
         <div class="slider-container">
             <div class="ticks">
@@ -23,12 +24,15 @@ import { NouisliderModule } from 'ng2-nouislider';
                 (change)="onChange($event)"></nouislider>
         </div>
         <div class="btn-container">
-            <button class="btn-close" (click)="onCloseBtnClicked()">C</button>
-            <button class="btn-year" (click)="onYearBtnClicked()">Y</button>
+            <button class="btn-year" (click)="onYearBtnClicked()">اختيار السنة</button>
         </div>
     </div>
     `,
     styles : [`
+        :host {
+            background-color:#00aa00;
+            border-radius: 0 0 25px 0;
+        }
         .container {
             display: flex;
             flex-direction: column;
@@ -39,13 +43,42 @@ import { NouisliderModule } from 'ng2-nouislider';
             display: flex;
             flex-direction: row-reverse;
         }
+        
         .btn-container button {
             flex-grow:2;
         }
         .btn-container .btn-year {
             border-radius: 0 0 25px 0;
-            border:1px solid black;
+            border:0;
+            border-top:1px solid white;
+            color:white;
+            cursor: pointer;
+            background-color: #00aa00;
         }
+
+        .btn-close {
+        
+            position: absolute;
+            left: 100%;
+            top:70%;
+            width: 40px;
+            height: 80px;
+
+            cursor: pointer;
+
+            background-image: url('assets/arrow-left.png');
+            box-shadow: 1px 0 3px 0 rgba(0,0,0,.85);
+            background-repeat: no-repeat;
+            background-position: 8px center;
+            background-size: 17px 30px;
+            background-color: #00aa00;
+            border-radius: 0 25px 25px 0;
+        }
+
+        .slider-gone :host .btn-close {
+            background-image: url('assets/arrow-right.png');
+        }
+
         .container .logo {
             background-image: url('assets/logo.png');
         }
@@ -60,6 +93,8 @@ import { NouisliderModule } from 'ng2-nouislider';
             display: flex;
             flex-direction: column-reverse;
             justify-content: space-between;
+            color: white;
+            font-weight: bold;
         }
         .ticks div {
             height: auto;
@@ -69,6 +104,10 @@ import { NouisliderModule } from 'ng2-nouislider';
         }
         :host /deep/ div {
             height:100%;
+        }
+        
+        :host /deep/ .noUi-vertical .noUi-handle {
+            right: -6px;
         }
 `]
 })
@@ -117,5 +156,9 @@ export class AlfehrestSliderComponent {
 
     private onCloseBtnClicked() {
         this.close_button_clicked.emit();
+    }
+
+    private onYearBtnClicked() {
+        console.log("Not implemented");
     }
 }

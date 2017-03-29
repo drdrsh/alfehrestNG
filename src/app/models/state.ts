@@ -13,7 +13,7 @@ export class StateModel extends Model{
 
     public static fromInitial(obj:any) {
         let injector = ReflectiveInjector.resolveAndCreate([DateConverterService, TranslateService, TRANSLATION_PROVIDERS]);
-        let entity = new StateModel(injector.get(DateConverterService), obj);
+        let entity = new StateModel(injector.get(DateConverterService), injector.get(TranslateService), obj);
         entity._entityType = 'state';
         return entity;
     }
@@ -96,6 +96,11 @@ export class StateModel extends Model{
     }
 
     public get data() : DisplayData {
+
+        if(this._displayData) {
+            return this._displayData;
+        }
+
         let data = new DisplayData();
         data.title = this.internalData.name;
 
@@ -104,20 +109,20 @@ export class StateModel extends Model{
         let referenceSection = new DisplaySection();
 
         mainSection.cls = "state";
-        mainSection.title =  this.internalData.name;
-        mainSection.subtitle = "Subtitle";
+        mainSection.title =  "";
+        mainSection.subtitle = "";
         mainSection.content = this.internalData.description;
         mainSection.type = "text";
 
         rulerSection.cls = "ruler";
         rulerSection.title =  this._activeState.ruler.name;
-        rulerSection.subtitle = "Subtitle";
+        rulerSection.subtitle = "";
         rulerSection.content = this._activeState.ruler.description;
         rulerSection.type = "text";
 
         referenceSection.cls = "references";
-        referenceSection.title = "References";
-        referenceSection.subtitle = "Subtitle";
+        referenceSection.title = "المراجع";
+        referenceSection.subtitle = "";
         referenceSection.content = this.internalData.references;
         referenceSection.type = "list";
 
@@ -125,7 +130,8 @@ export class StateModel extends Model{
         data.sections.push(rulerSection);
         data.sections.push(referenceSection);
 
-        return data;
+        this._displayData = data;
+        return this._displayData;
     }
 
     public updateFromPartial(subid:number, partial:any) {
@@ -197,6 +203,5 @@ export class StateModel extends Model{
         }
         return this._isVisible;
     }
-
 
 }
